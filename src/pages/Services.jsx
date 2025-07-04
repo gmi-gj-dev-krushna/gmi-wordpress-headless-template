@@ -22,7 +22,10 @@ export default function Services() {
         <ServiceCard
           key={service.id}
           title={service.title}
-          content={service.content}
+          content={service.excerpt} // or service.content, depending on what you want to preview
+          image={service.featured_image}
+          slug={service.slug}
+          type="services"
         />
       ))}
     </section>
