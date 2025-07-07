@@ -22,8 +22,9 @@ export default function Team() {
         <TeamCard
           key={member.id}
           name={member.title}
-          designation={member.designation}
+          designation={member.custom_fields.designation}
           image={member.featured_image}
+          slug={member.slug}
         />
       ))}
     </section>

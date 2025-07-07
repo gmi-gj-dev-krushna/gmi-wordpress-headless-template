@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { fetchData } from "../lib/api";
 
 const Header = () => {
-  const [logo, setLogo] = useState("");
-  const [menuItems, setMenuItems] = useState([]);
+  const [headerData, setHeaderData] = useState({
+    logo: "",
+    menu: [],
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchNavbarData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost/wordpress/wp-json/custom/v1/header"
-        );
-        const data = res.data;
-        setLogo(data.logo);
-        setMenuItems(data.menu);
+        const data = await fetchData("/header");
+        setHeaderData(data);
+        setError(null);
       } catch (err) {
         console.error("Failed to load header:", err);
+        setError("Failed to load header");
       } finally {
         setLoading(false);
       }
@@ -27,7 +28,17 @@ const Header = () => {
 
   if (loading) {
     return (
-      <div className="p-4 shadow text-center text-white">Loading header...</div>
+      <div className="p-4 shadow text-center text-white bg-black">
+        Loading header...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 shadow text-center text-red-500 bg-black">
+        {error}
+      </div>
     );
   }
 
@@ -36,8 +47,15 @@ const Header = () => {
       <div className="mx-auto px-16 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
-          {logo ? (
-            <img src={logo} alt="Site Logo" className="h-[120px] w-auto" />
+          {headerData.logo ? (
+            <img
+              src={headerData.logo}
+              alt="Site Logo"
+              className="h-[120px] w-auto"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
           ) : (
             <span className="text-xl font-bold">My Site</span>
           )}
@@ -46,7 +64,7 @@ const Header = () => {
         {/* Navigation */}
         <nav>
           <ul className="flex space-x-6">
-            {menuItems.map((item) => (
+            {headerData.menu.map((item) => (
               <li key={item.id}>
                 <a
                   href={item.url}
